@@ -13,12 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Install Terraform
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget -q https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip
+          unzip -o terraform_1.13.3_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform version
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -26,6 +31,7 @@ jobs:
           role-to-assume: arn:aws:iam::327805670666:role/gitlab
           role-session-name: GitHubActionsTerraform
           aws-region: ap-south-1
+          allowed-account-ids: 327805670666
 
       - name: Verify AWS identity
         run: aws sts get-caller-identity
